@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 
 from models import Transport, FindTransport, User
 from dtos import TransportModel
@@ -11,8 +11,10 @@ transport = APIRouter(prefix='/api/Transport', tags=["TransportController"])
 @transport.get("/{id}", response_model=TransportModel)
 async def get_transport(id: int, db: db_dependency):
     transport = FindTransport.get_transport_by_id(id, db)
+
     if not transport:
         raise HTTPException(status_code=404, detail="Transport not found")
+    
     return transport
 
 @transport.post("/", response_model=TransportModel)
@@ -26,11 +28,12 @@ def is_owner(user: User, transport: Transport) -> bool:
 @transport.put("/{id}", response_model=TransportModel)
 async def update_user_transport(id: int, data: TransportModel, db: db_dependency, user: user_с):
     transport = FindTransport.get_transport_by_id(id, db)
+    
     if not transport:
         raise HTTPException(status_code=404, detail="Transport not found")
     
     if not is_owner(user, transport):
-        raise HTTPException(status_code=403, detail="У вас нет разрешения на изменение этого транспорта")
+        raise HTTPException(status_code=403, detail="You do not have permission")
     
     return update_transport(transport, data, db)
 
@@ -42,6 +45,6 @@ async def update_user_transport(id: int, db: db_dependency, user: user_с):
         raise HTTPException(status_code=404, detail="Transport not found")
     
     if not is_owner(user, transport):
-        raise HTTPException(status_code=403, detail="У вас нет разрешения на изменение этого транспорта")
+        raise HTTPException(status_code=403, detail="You do not have permission")
     
     return delete_transport(transport, db)

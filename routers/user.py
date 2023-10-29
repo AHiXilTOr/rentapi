@@ -9,16 +9,26 @@ from database import db_dependency
 from services import get_current_user, update_user, create_user_request, authenticate_user, create_access_token
 
 account = APIRouter(prefix='/api/Account', tags=["AccountController"])
-
 user_dependency = Annotated[User, Depends(get_current_user)]
 
 async def get_current_active_user(current_user: user_dependency, db: db_dependency):
     user = FindUser.get_user_by_id(current_user, db)
+
     if user.disabled:
         raise HTTPException(status_code=403, detail="Inactive user")
+    
+    return user
+
+async def admin_endpoint(current_user: user_dependency, db: db_dependency):
+    user = FindUser.get_user_by_id(current_user, db)
+
+    if not user.isAdmin:
+        raise HTTPException(status_code=403, detail="You do not have permission")
+    
     return user
 
 user_с = Annotated[User, Depends(get_current_active_user)]
+user_a = Annotated[User, Depends(admin_endpoint)]
 
 @account.post('/SignUp', response_model=Token)
 async def create_user(data: UserRequest, db: db_dependency):

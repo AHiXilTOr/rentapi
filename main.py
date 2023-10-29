@@ -7,6 +7,9 @@ from database import engine, Base
 from routers.user import account
 from routers.transport import transport
 from routers.rent import rent
+from routers.payment import payment
+from routers.admin import adminaccount, admintranstor, adminrent
+from admin import initialize_admin
 
 Base.metadata.create_all(bind=engine)
 
@@ -16,9 +19,9 @@ app = FastAPI()
 def main():
     return PlainTextResponse("Главная страница")
 
-app.include_router(account)
-app.include_router(transport)
-app.include_router(rent)
+routers = [account, transport, rent, payment, adminaccount, admintranstor, adminrent]
+for router in routers:
+    app.include_router(router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -27,6 +30,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+async def on_startup():
+    initialize_admin()
 
 if __name__ == "__main__":
     uvicorn.run('main:app', host='0.0.0.0', port=3000, reload=False)

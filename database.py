@@ -2,10 +2,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from dotenv.main import load_dotenv
-import os
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from typing import Annotated
+import os
 
 load_dotenv()
 SQLALCHEMY_URL = os.getenv("SQLALCHEMY_URL")
