@@ -8,7 +8,7 @@ from routers.user import user_с
 
 transport = APIRouter(prefix='/api/Transport', tags=["TransportController"])
 
-@transport.get("/{id}", response_model=TransportModel)
+@transport.get("/{id}", response_model=TransportModel, summary="Получить транспорт по ID")
 async def get_transport(id: int, db: db_dependency):
     transport = FindTransport.get_transport_by_id(id, db)
 
@@ -17,7 +17,7 @@ async def get_transport(id: int, db: db_dependency):
     
     return transport
 
-@transport.post("/", response_model=TransportModel)
+@transport.post("/", response_model=TransportModel, summary="Создать транспорт текущего пользователя")
 async def create_user_transport(data: TransportModel, db: db_dependency, user: user_с):
     transport = create_transport_request(data, db, user.id)
     return transport
@@ -25,7 +25,7 @@ async def create_user_transport(data: TransportModel, db: db_dependency, user: u
 def is_owner(user: User, transport: Transport) -> bool:
     return user.id == transport.user_id
 
-@transport.put("/{id}", response_model=TransportModel)
+@transport.put("/{id}", response_model=TransportModel, summary="Обновить транспорт текущего пользователя по ID")
 async def update_user_transport(id: int, data: TransportModel, db: db_dependency, user: user_с):
     transport = FindTransport.get_transport_by_id(id, db)
     
@@ -37,7 +37,7 @@ async def update_user_transport(id: int, data: TransportModel, db: db_dependency
     
     return update_transport(transport, data, db)
 
-@transport.delete("/{id}")
+@transport.delete("/{id}", summary="Удалить транспорт текущего пользователя по ID")
 async def update_user_transport(id: int, db: db_dependency, user: user_с):
     transport = FindTransport.get_transport_by_id(id, db)
     

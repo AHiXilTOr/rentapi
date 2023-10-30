@@ -8,28 +8,28 @@ from services import create_user_request, update_user, create_transport_request,
 
 adminaccount = APIRouter(prefix='/api/Admin/Account', tags=["AdminAccountController"])
 
-@adminaccount.get("/")
+@adminaccount.get("/", summary="Получить все аккаунты")
 async def get_all_accounts(user: user_a, db: db_dependency, start: int = 0, count: int = 10):
     accounts = db.query(User).offset(start).limit(count).all()
     return accounts
 
-@adminaccount.get("/{id}")
+@adminaccount.get("/{id}", summary="Получить аккаунт по ID")
 async def get_account_by_id(id: int, user: user_a, db: db_dependency):
     account = FindUser.get_user_by_id(id, db)
     return account
 
-@adminaccount.post("/")
+@adminaccount.post("/", summary="Создать аккаунт")
 async def create_account(data: AdminUserRequest, user: user_a, db: db_dependency):
     account = create_user_request(data, db)
     return account
 
-@adminaccount.put("/{id}")
+@adminaccount.put("/{id}", summary="Обновить аккаунт по ID")
 async def update_account(id: int, data: AdminUserRequest, user: user_a, db: db_dependency):
     user = FindUser.get_user_by_id(id, db)
     account = update_user(user, data, db)
     return account
 
-@adminaccount.delete("/{id}")
+@adminaccount.delete("/{id}", summary="Удалить аккаунт по ID")
 async def delete_account(id: int, user: user_a, db: db_dependency):
     user = FindUser.get_user_by_id(id, db)
 
@@ -42,7 +42,7 @@ async def delete_account(id: int, user: user_a, db: db_dependency):
 
 admintranstor = APIRouter(prefix='/api/Admin/Transport', tags=["AdminTranstorController"])
 
-@admintranstor.get("/")
+@admintranstor.get("/", summary="Получить все транспортные средства")
 async def get_all_transport(user: user_a, db: db_dependency, start: int = 0, count: int = 10, transportType: str = 'All'):
     query = db.query(Transport)
     
@@ -53,23 +53,23 @@ async def get_all_transport(user: user_a, db: db_dependency, start: int = 0, cou
     transports = query.all()
     return transports
 
-@admintranstor.get("/{id}")
+@admintranstor.get("/{id}", summary="Получить транспорт по ID")
 async def get_transport_by_id(id: int, user: user_a, db: db_dependency):
     transport = FindTransport.get_transport_by_id(id, db)
     return transport
 
-@admintranstor.post("/")
+@admintranstor.post("/", summary="Создать новое транспортное средство с указанием владельца")
 async def create_transport(data: AdminTransportModel, user: user_a, db: db_dependency):
     transport = create_transport_request(data, db)
     return transport
 
-@admintranstor.put("/{id}")
+@admintranstor.put("/{id}", summary="Обновить транспорт по ID")
 async def update_transport_by_id(id: int, data: AdminTransportModel, user: user_a, db: db_dependency):
     query = FindTransport.get_transport_by_id(id, db)
     transport = update_transport(query, data, db)
     return transport
 
-@admintranstor.delete("/{id}")
+@admintranstor.delete("/{id}", summary="Удалить транспорт по ID")
 async def delete_transport(id: int, user: user_a, db: db_dependency):
     transport = FindTransport.get_transport_by_id(id, db)
 
@@ -82,34 +82,34 @@ async def delete_transport(id: int, user: user_a, db: db_dependency):
 
 adminrent = APIRouter(prefix='/api/Admin', tags=["AdminRentController"])
 
-@adminrent.get("/Rent/{rentId}")
+@adminrent.get("/Rent/{rentId}", summary="Получить аренду по ID")
 async def get_rent_by_id(rentId: int, user: user_a, db: db_dependency):
     rent = FindRent.get_rent_by_id(rentId, db)
     return rent
 
-@adminrent.get("/UserHistory/{userId}")
+@adminrent.get("/UserHistory/{userId}", summary="Получить историю аренды по ID аккаунта")
 async def get_rent_history_by_account_id(userId: int, user: user_a, db: db_dependency):
     rent = FindRent.get_rent_by_user_id(userId, db)
     return rent
 
-@adminrent.get("/TransportHistory/{transportId}")
+@adminrent.get("/TransportHistory/{transportId}", summary="Получить историю аренды по ID транспорта")
 async def get_rent_transport_history_by_account_id(transportId: int, user: user_a, db: db_dependency):
     rent = FindRent.get_rent_by_transport_id(transportId, db)
     return rent
 
-@adminrent.post("/Rent")
+@adminrent.post("/Rent", summary="Создать новую аренду с указанием владельца")
 async def create_rent_by_account_id(data: AdminRentModel, user: user_a, db: db_dependency):
     rent = create_rent_request(data, user, db)
     return rent
 
-@adminrent.post("/Rent/End/{rentId}")
+@adminrent.post("/Rent/End/{rentId}", summary="Завершить аренду по ID")
 async def end_rent_by_account_id(rentId: int, latitude: float, longitude: float, user: user_a, db: db_dependency):
     rent = end_rent(rentId, latitude, longitude, user, db)
     return rent
 
 VALID_RENT_TYPES = ['Minutes', 'Days']
 
-@adminrent.put("/Rent/{rentId}")
+@adminrent.put("/Rent/{rentId}", summary="Обновить аренду по ID")
 async def update_rent_by_account_id(rentId: int, data: AdminRentModelWithAll, user: user_a, db: db_dependency):
     try:
         if not data.rentType in VALID_RENT_TYPES:
@@ -129,7 +129,7 @@ async def update_rent_by_account_id(rentId: int, data: AdminRentModelWithAll, us
     except Exception as e:
         raise HTTPException(status_code=400, detail=f'{e}')
 
-@adminrent.delete("/Rent/End/{rentId}")
+@adminrent.delete("/Rent/End/{rentId}", summary="Удалить аренду по ID (завершить и удалить из истории)")
 async def delete_rent_by_account_id(rentId: int, user: user_a, db: db_dependency):
     rent = FindRent.get_rent_by_id(rentId, db)
 
