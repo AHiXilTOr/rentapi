@@ -4,4 +4,5 @@
 2. URL-строка для подключения к базе данных PostgreSQL находится в .env
 3. py main.py
 
-## URL: http://localhost:3080/docs
+## URL: http://localhost:3000/docs
+## Админ: name - admin, password - 123
