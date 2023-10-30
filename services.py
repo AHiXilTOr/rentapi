@@ -5,7 +5,7 @@ from datetime import timedelta, datetime
 from passlib.context import CryptContext
 from typing import Annotated
 from jose import jwt, JWTError
-from sqlalchemy.exc import *
+from sqlalchemy.exc import IntegrityError
 import os
 
 from models import User, FindUser, Transport, Rent, FindRent, FindTransport
@@ -167,7 +167,7 @@ def create_rent_request(data, user: User, db: Session):
         raise HTTPException(status_code=404, detail="Transport not found")
     
     if not transport.canBeRented:
-        raise HTTPException(status_code=404, detail="Transport is rented")
+        raise HTTPException(status_code=400, detail="Transport is rented")
     
     time = datetime.now()
     rent = Rent(rentType=data.rentType, transportId=data.transportId)
@@ -188,10 +188,14 @@ def create_rent_request(data, user: User, db: Session):
     elif data.rentType == 'Days':
         rent.endTime = (time + timedelta(days=data.duration)).strftime("%Y-%m-%d %H:%M:%S")
         rent.priceOfUnit = transport.dayPrice
-        rent.finalPrice = transport.dayPrice * data.duration * 84
+        rent.finalPrice = transport.dayPrice * data.duration
     else:
         raise HTTPException(status_code=400, detail="Invalid rent type")
     
+    if user.balance < rent.finalPrice:
+        raise HTTPException(status_code=400, detail="Insufficient balance")
+
+    user.balance -= rent.finalPrice
     transport.canBeRented = False
 
     db.add(rent)
