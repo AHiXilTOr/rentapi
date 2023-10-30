@@ -1,8 +1,15 @@
 # Инструкция
 
-1. pip install -r requirements.txt
-2. URL-строка для подключения к базе данных PostgreSQL находится в .env
-3. py main.py
+1. Установите зависимости:
+   ```bash
+   pip install -r requirements.txt
+Укажите URL-строку для подключения к базе данных PostgreSQL в файле .env.
 
-## URL: http://localhost:3000/docs
-## Админ: name - admin, password - 123
+2. Запустите основной скрипт:
+    ```bash
+    py main.py
+Доступ к документации доступен по следующему URL: http://localhost:3000/docs
+
+Администраторские данные:
+- Имя пользователя: admin
+- Пароль: 123
